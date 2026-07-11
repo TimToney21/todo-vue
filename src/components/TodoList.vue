@@ -1,54 +1,67 @@
 <template>
   <ul class="todo-list" v-for="todo in todoList" :key="todo.id">
-    <li class="todo-item" v-if="todo.text !== ''">
+    <li class="todo-item" v-if="todo.text && todo.text.trim() !== ''">
       <div class="edit-mode" v-if="editingId === todo.id">
-        <input type="text" v-model="editText" @keyup.enter="saveEdit(todo)" />
-        <button @click="saveEdit(todo)">Save</button>
-        <button @click="cancelEdit">Cancel</button>
+        <input
+          type="text"
+          v-model="editText"
+          @keyup.enter="saveEdit(todo)"
+          ref="editInput"
+        />
+        <button @click="saveEdit(todo)" class="btn-success">Save</button>
+        <button @click="cancelEdit" class="btn-delete">Cancel</button>
       </div>
-      <div class="view-mode" v-else>
+      <div v-else class="view-mode">
         {{ todo.text }}
         <div class="todo-actions">
           <button @click="deleteTodo(todo)" class="btn-delete">Delete</button>
-          <button @click="textEdit(todo)" class="btn-edit">Edit</button>
+          <button @click="startEdit(todo)" class="btn-edit">Edit</button>
         </div>
       </div>
     </li>
   </ul>
 </template>
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { nextTick, ref } from 'vue'
+import type {Todo} from '@/types/todo.ts'
 
-defineProps({
-  todoList: {
-    type: Array,
-    required: true
-  }
-})
+interface Props {
+  todoList: Todo[]
+}
+defineProps<Props>()
 
-const emit = defineEmits(['delete-todo', 'save-edit'])
+const emit = defineEmits<{
+  (e: 'delete-todo', todo:Todo): void
+  (e: 'save-edit', todo:Todo): void
+}>()
 
-const editText = ref('')
-const editingId = ref(null)
+const editText = ref<string>('')
+const editingId = ref<number | null>(null)
+const editInput = ref<HTMLInputElement | null>(null)
 
-function deleteTodo(todo) {
+function deleteTodo(todo: Todo): void {
   emit('delete-todo', todo)
 }
-function textEdit(todo) {
+function startEdit(todo: Todo): void {
   editText.value = todo.text
   editingId.value = todo.id
+  nextTick(() => {
+    if(editInput.value) {
+      editInput.value.focus()
+    }
+  })
 }
-function saveEdit(todo) {
-  const trimmedText = textEdit.value.trim()
+function saveEdit(todo: Todo): void {
+  const trimmedText: string = editText.value.trim()
   if (trimmedText === '') return
-  const updatedTodo = {
+  const updatedTodo: Todo = {
     ...todo,
     text: trimmedText
   }
   emit('save-edit', updatedTodo)
   editingId.value = null
 }
-function cancelEdit() {
+function cancelEdit(): void {
   editingId.value = null
 }
 </script>
@@ -122,5 +135,11 @@ function cancelEdit() {
 }
 .edit-mode button:hover {
   transform: scale(1.1);
+}
+.view-mode {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 </style>

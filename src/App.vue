@@ -9,28 +9,31 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import TodoList from './components/TodoList.vue'
 import TodoInput from './components/TodoInput.vue'
+import type {Todo} from '@/types/todo.ts'
 
-const todoList = ref([])
+const todoList = ref<Todo[]>([])
 
-function addTodo(text) {
-  todoList.value.push({
+function addTodo(text: string): void {
+  const newTodo: Todo = {
     text: text,
     id: Date.now(),
-  })
+  }
+  todoList.value.push(newTodo)
 }
 
-function deleteTodo(todo) {
-  const index = todoList.value.indexOf(todo)
+function deleteTodo(todo: Todo): void {
+  const index: number = todoList.value.indexOf(todo)
   if (index > -1) {
     todoList.value.splice(index, 1)
   }
 }
-function saveEdit(updatedTodo) {
-  const index = todoList.value.findIndex(t => t.id === updatedTodo.id)
+function saveEdit(updatedTodo: Todo): void {
+  const index: number = todoList.value.findIndex(
+    (t: Todo) => t.id === updatedTodo.id)
   if (index > -1) {
     todoList.value[index] = updatedTodo
   }

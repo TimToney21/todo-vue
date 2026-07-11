@@ -7,21 +7,21 @@
       placeholder="Text"
       @keyup.enter="handleAdd"
     />
-    <button @click="handleAdd" class="btn-add">
-      Add
-    </button>
+    <button @click="handleAdd" class="btn-add">Add</button>
   </section>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 
-const emit = defineEmits(['add-todo'])
+const emit = defineEmits<{
+  (e: 'add-todo', text: string): void
+}>()
 
-const inputTodo = ref('')
+const inputTodo = ref<string>('')
 
-function handleAdd() {
-  const trimmedTodo = inputTodo.value.trim()
-  if(trimmedTodo === '') return
+function handleAdd(): void {
+  const trimmedTodo: string = inputTodo.value.trim()
+  if (trimmedTodo === '') return
 
   emit('add-todo', trimmedTodo)
   inputTodo.value = ''
