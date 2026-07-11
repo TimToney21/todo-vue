@@ -1,6 +1,6 @@
 <template>
   <ul class="todo-list" v-for="todo in todoList" :key="todo.id">
-    <li class="todo-item" v-if="todo.text != ''">
+    <li class="todo-item" v-if="todo.text !== ''">
       <div class="edit-mode" v-if="editingId === todo.id">
         <input type="text" v-model="editText" @keyup.enter="saveEdit(todo)" />
         <button @click="saveEdit(todo)">Save</button>
@@ -19,7 +19,7 @@
 <script setup>
 import { ref } from 'vue'
 
-const props = defineProps({
+defineProps({
   todoList: {
     type: Array,
     required: true
@@ -73,13 +73,6 @@ function cancelEdit() {
 .todo-item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
-}
-.todo-text {
-  font-size: 16px;
-  color: #2d3748;
-  word-break: break-word;
-  flex: 1;
-  margin-right: 12px;
 }
 .todo-actions {
   display: flex;
